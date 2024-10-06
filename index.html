@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: 'scraper.php',
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    let output = '';
+                    for (let ip in data) {
+                        output += `<h2>IP: ${ip}</h2>`;
+                        for (let keyword in data[ip]) {
+                            output += `<h3>Keyword: ${keyword}</h3>`;
+                            output += '<ul>';
+                            data[ip][keyword].forEach(paragraph => {
+                                output += `<li>${paragraph}</li>`;
+                            });
+                            output += '</ul>';
+                        }
+                    }
+                    $('#results').html(output);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                    $('#results').html('<p>An error occurred while fetching data.</p>');
+                }
+            });
+        });
+		$('#add-ip-form').on('submit', function(e) {
+        e.preventDefault();
+        let newIP = $('#new-ip').val();
+        $.ajax({
+            url: 'scraper.php',
+            method: 'POST',
+            data: { new_ip: newIP },
+            success: function(response) {
+                alert('IP added successfully');
+                // Optionally refresh the results here
+            },
+            error: function() {
+                alert('Error adding IP');
+            }
+        });
+    });
+
+    </script>
+</head>
+<body>
+    <h1>Web Scraper Results</h1>
+    <div id="results"></div>
+</body>
+</html>
